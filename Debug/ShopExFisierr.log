@@ -1,0 +1,5 @@
+﻿  main.c
+c:\learning\c\shopexfisierr\main.c(17): warning C4047: 'function': 'const char *' differs in levels of indirection from 'int'
+c:\learning\c\shopexfisierr\main.c(17): warning C4024: 'fopen': different types for formal and actual parameter 2
+c:\learning\c\shopexfisierr\main.c(64): warning C4047: '<': 'int' differs in levels of indirection from 'int *'
+  ShopExFisierr.vcxproj -> C:\Learning\C\ShopExFisierr\Debug\ShopExFisierr.exe
