@@ -12,9 +12,9 @@ typedef struct {
 
 }produs;
 
-void readProcess(char* numeFis, produs* p, int *n) {
+void readProcess(char* numeFis, produs *p, int *n) {
 
-	FILE *pf = fopen(numeFis, 'r');
+	FILE *pf = fopen(numeFis, "r");
 
 	if (pf == NULL) {
 		printf("Couldn't open File");
@@ -22,27 +22,34 @@ void readProcess(char* numeFis, produs* p, int *n) {
 	}
 
 	*n = 0;
-	produs change;
+	
 
 	while (1) {
 		if (fscanf(pf, "%s", p[*n].denumire) != 1) {
 			break;
 		}
 
-		p[*n].denumire[strlen(p[*n].denumire) - 1] = '\0';
+		p[*n].denumire[strlen(p[*n].denumire)] = '\0';
 
 
 		int x, iter = 0;
-		char ch1, ch2;
+		char ch;
+		
 
 		
+		
 			do {
-				fscanf(pf, "%d%c%c",&x, &ch1, &ch2);
+				fseek(pf, 3, SEEK_CUR);
+				fscanf(pf, "%d%c", &x, &ch);
+
 				switch (iter)
 				{
 				case 0:
 					p[*n].codProd = x;
 					iter++;
+					fseek(pf, 3, SEEK_CUR);
+					fscanf(pf, "%s", p[*n].um);
+					p[*n].um[strlen(p[*n].um)] = '\0';
 					break;
 				case 1:
 					p[*n].cantitate = x;
@@ -51,45 +58,63 @@ void readProcess(char* numeFis, produs* p, int *n) {
 				case 2:
 					p[*n].pretUnitar = x;
 					iter++;
-					break;					
+					break;
 				default:
 					break;
 				}
-				
-			} while (ch2 != '.');
+								
+			} while (ch != '.');
 			
-			
+		(*n)++;
 		iter = 0;
-		*n++;
 	}
-	for (int i = 0; i < n-1; i++) {
-		if (p[i].codProd > p[i + 1].codProd) {
-			change = p[i];
-			p[i] = p[i + 1];
-			p[i + 1] = change;
-		}
-	}
+	
 	fclose(pf);
 }
 
 void writeFile(char* numeFis, produs* p, int n) {
 	FILE *pf = fopen(numeFis, "w");
+	// 0 9 7 5 8 5 4 
+	// 0 1 2 3 4 5 6
+	
+	int ord[11];
+	int aux;
 
 	for (int i = 0; i < n; i++) {
-		fprintf(pf, "%s          %d           %s           %d              %d\n", p[i].denumire, p[i].codProd,
-			p[i].um, p[i].cantitate, p[i].pretUnitar);
+		ord[i] = i;
 	}
+
+	for (int i = 0; i < n/2; i++) {
+		for (int j = 0; j < n - 1; j++) {
+			if (p[ord[j]].codProd > p[ord[j + 1]].codProd) {
+				aux = ord[j];
+				ord[j] = ord[j + 1];
+				ord[j + 1] = aux;				
+			}
+		}
+	}
+
+	for (int i = 0; i < n; i++) {
+		fprintf(pf, "%s          %d           %s           %d              %d\n", p[ord[i]].denumire, p[ord[i]].codProd,
+			p[ord[i]].um, p[ord[i]].cantitate, p[ord[i]].pretUnitar);
+	}
+	fflush(pf);
 	fclose(pf);
+	for (int i = 0; i < n; i++) {
+		printf("%s          %d           %s           %d              %d\n", p[ord[i]].denumire, p[ord[i]].codProd,
+			p[ord[i]].um, p[ord[i]].cantitate, p[ord[i]].pretUnitar);
+	}
 
 }
 
-int main() {
+int main(int argc, char *argv[]) {
 
 	produs p[100];
 	int n;
 
 	readProcess("produse.txt", p, &n);
-	writeFile("produseSortate.txt", p, n);
+
+	writeFile("PSortat.txt", p, n);
 
 	system("pause");
 
